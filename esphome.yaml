@@ -1,0 +1,59 @@
+web_server:
+  port: 80   
+
+esp32_camera_web_server:
+  - port: 8080
+    mode: stream
+  - port: 8081
+    mode: snapshot
+
+captive_portal:
+    
+esp32_camera:
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+  name: "Doorbell camera"
+  resolution: 1024x768
+  jpeg_quality: 10
+  max_framerate: 10 fps
+  idle_framerate: 0.5 fps
+  vertical_flip: false
+  brightness: 1
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2811
+    pin: GPIO15
+    num_leds: 8
+    name: "Doorbell Light"  
+    id: doorbell_light
+  - platform: status_led
+    pin: GPIO4
+    name: "Doorbell Onboard LED"  
+
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO14    
+    name: "Doorbell button"    
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 1s
+    on_press:
+      - light.addressable_set:
+          id: doorbell_light
+          red: 50%
+          green: 38%
+          blue: 27%
+      - delay: 5s     
+      - light.turn_off: doorbell_light    
