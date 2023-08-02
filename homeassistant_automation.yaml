@@ -1,0 +1,25 @@
+alias: Doorbell push
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.doorbell_doorbell_button
+    from: "off"
+    to: "on"
+condition: []
+action:
+  - service: camera.snapshot
+    data:
+      filename: >-
+        /config/www/snapshots/doorbell_{{ now ().year }}{{ now ().month }}{{ now ().day }}_{{ now ().hour }}{{ now ().minute }}.jpg
+    target:
+      device_id: 259cb70a2f3cb893f3ca152e51aefa60 #Must be updated
+  - service: notify.mobile_app_sm_g990e #Must be updated
+    data_template:
+      title: Doorbell
+      message: Someone is at the door
+      data:
+        image: >-
+          https://YOUR.DOMAIN.COM/local/snapshots/doorbell_{{ now ().year }}{{ now ().month }}{{ now ().day }}_{{ now ().hour }}{{ now ().minute }}.jpg #Must be updated
+        clickAction: /lovelace/cameras
+mode: single
